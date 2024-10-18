@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+
+    <TextView
+        android:id="@+id/textViewTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:background="#800080"
+        android:padding="16dp"
+        android:text="Estacionamiento"
+        android:textColor="#FFFFFF"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/textViewEntrada"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Entrada HH:MM"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewTitle" />
+
+    <EditText
+        android:id="@+id/editTextEntradaHora"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="HH"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textViewEntrada"
+        app:layout_constraintTop_toTopOf="@+id/textViewEntrada" />
+
+    <TextView
+        android:id="@+id/textViewColon1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text=" : "
+        app:layout_constraintStart_toEndOf="@+id/editTextEntradaHora"
+        app:layout_constraintTop_toTopOf="@+id/textViewEntrada" />
+
+    <EditText
+        android:id="@+id/editTextEntradaMinuto"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="MM"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textViewColon1"
+        app:layout_constraintTop_toTopOf="@+id/textViewEntrada" />
+
+
+    <TextView
+        android:id="@+id/textViewSalida"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="Salida HH:MM"
+        android:textSize="18sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewEntrada" />
+
+    <EditText
+        android:id="@+id/editTextSalidaHora"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="HH"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textViewSalida"
+        app:layout_constraintTop_toTopOf="@+id/textViewSalida" />
+
+    <TextView
+        android:id="@+id/textViewColon2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:text=" : "
+        app:layout_constraintStart_toEndOf="@+id/editTextSalidaHora"
+        app:layout_constraintTop_toTopOf="@+id/textViewSalida" />
+
+    <EditText
+        android:id="@+id/editTextSalidaMinuto"
+        android:layout_width="50dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:hint="MM"
+        android:inputType="number"
+        app:layout_constraintStart_toEndOf="@+id/textViewColon2"
+        app:layout_constraintTop_toTopOf="@+id/textViewSalida" />
+
+
+    <TextView
+        android:id="@+id/textViewMinutosEstancia"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="148dp"
+        android:layout_marginTop="92dp"
+        android:text="999999"
+        android:textSize="24sp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSalida" />
+
+    <TextView
+        android:id="@+id/textViewMontoPagar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:text="A pagar : $$$$$$$"
+        android:textColor="#000000"
+        android:textSize="24sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewMinutosEstancia" />
+
+    <Button
+        android:id="@+id/buttonCalcular"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="104dp"
+        android:layout_marginTop="168dp"
+       android:backgroundTint="@color/black"
+        android:text="CALCULAR"
+        android:textColor="#FFFFFF"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.08"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewMontoPagar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
