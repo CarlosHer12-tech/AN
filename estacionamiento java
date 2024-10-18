@@ -1,0 +1,84 @@
+package com.example.estacionamiento;
+
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText entradaHoras, entradaMinutos, salidaHoras, salidaMinutos;
+    private TextView estanciaMinutosText, montoPagarText;
+    private Button calcularButton;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        entradaHoras = findViewById(R.id.editTextEntradaHora);
+        entradaMinutos = findViewById(R.id.editTextEntradaMinuto);
+        salidaHoras = findViewById(R.id.editTextSalidaHora);
+        salidaMinutos = findViewById(R.id.editTextSalidaMinuto);
+        estanciaMinutosText = findViewById(R.id.textViewMinutosEstancia);
+        montoPagarText = findViewById(R.id.textViewMontoPagar);
+        calcularButton = findViewById(R.id.buttonCalcular);
+
+
+        calcularButton.setOnClickListener(v -> {
+            int entradaHora = Integer.parseInt(entradaHoras.getText().toString());
+            int entradaMinuto = Integer.parseInt(entradaMinutos.getText().toString());
+            int salidaHora = Integer.parseInt(salidaHoras.getText().toString());
+            int salidaMinuto = Integer.parseInt(salidaMinutos.getText().toString());
+
+            int estanciaMinutos = calcularEstancia(entradaHora, entradaMinuto, salidaHora, salidaMinuto);
+            double montoPagar = calcularMonto(estanciaMinutos);
+
+            estanciaMinutosText.setText(String.valueOf(estanciaMinutos));
+            montoPagarText.setText(String.format("$%.2f", montoPagar));
+        });
+    }
+
+    private int calcularEstancia(int entradaHora, int entradaMinuto, int salidaHora, int salidaMinuto) {
+        int entradaTotalMinutos = entradaHora * 60 + entradaMinuto;
+        int salidaTotalMinutos = salidaHora * 60 + salidaMinuto;
+        return salidaTotalMinutos - entradaTotalMinutos;
+    }
+
+    private double calcularMonto(int minutos) {
+        if (minutos <= 30) {
+            return 0.0;
+        } else if (minutos <= 60) {
+            return 4.0;
+        } else if (minutos <= 120) {
+            return 12.0;
+        } else if (minutos <= 180) {
+            return 26.0;
+        } else {
+            return calcularMontoHorasExtras(minutos);
+        }
+    }
+
+    private double calcularMontoHorasExtras(int minutos) {
+        int minutosExtra = minutos - 180;
+        double monto = 26.0;
+
+        int ciclosDe60 = minutosExtra / 60;
+        int minutosRestantes = minutosExtra % 60;
+
+        monto += ciclosDe60 * 14;
+
+        if (minutosRestantes > 0 && minutosRestantes <= 15) {
+            monto += 4.0;
+        } else if (minutosRestantes <= 30) {
+            monto += 8.0;
+        } else if (minutosRestantes <= 45) {
+            monto += 11.0;
+        } else if (minutosRestantes <= 60) {
+            monto += 14.0;
+        }
+
+        return monto;
+    }
+}
