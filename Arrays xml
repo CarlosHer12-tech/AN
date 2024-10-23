@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Conversión de Longitud</string>
+    <string-array name="units_array">
+        <item>milímetros</item>
+        <item>centímetros</item>
+        <item>decímetros</item>
+        <item>metros</item>
+        <item>pulgadas</item>
+        <item>pies</item>
+        <item>yardas</item>
+        <item>millas</item>
+        <item>kilómetros</item>
+    </string-array>
+</resources>
