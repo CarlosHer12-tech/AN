@@ -1,0 +1,83 @@
+package com.example.conversionapp;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    private EditText etFromValue;
+    private Spinner spFromUnit, spToUnit;
+    private TextView tvResult;
+    private Button btnCalculate;
+
+    String[] units = {"milímetros", "centímetros", "decímetros", "metros", "pulgadas", "pies", "yardas", "millas", "kilómetros"};
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etFromValue = findViewById(R.id.etFromValue);
+        spFromUnit = findViewById(R.id.spFromUnit);
+        spToUnit = findViewById(R.id.spToUnit);
+        tvResult = findViewById(R.id.tvResult);
+        btnCalculate = findViewById(R.id.btnCalculate);
+
+        // Setting up spinners
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, units);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFromUnit.setAdapter(adapter);
+        spToUnit.setAdapter(adapter);
+
+        btnCalculate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                double fromValue = Double.parseDouble(etFromValue.getText().toString());
+                String fromUnit = spFromUnit.getSelectedItem().toString();
+                String toUnit = spToUnit.getSelectedItem().toString();
+                double result = convert(fromValue, fromUnit, toUnit);
+                tvResult.setText(String.format("Resultado: %.2f %s", result, toUnit));
+            }
+        });
+    }
+
+    // Conversion logic
+    private double convert(double value, String fromUnit, String toUnit) {
+        // Conversion rates to meters
+        double meters = 0;
+
+        switch (fromUnit) {
+            case "milímetros": meters = value / 1000; break;
+            case "centímetros": meters = value / 100; break;
+            case "decímetros": meters = value / 10; break;
+            case "metros": meters = value; break;
+            case "pulgadas": meters = value * 0.0254; break;
+            case "pies": meters = value * 0.3048; break;
+            case "yardas": meters = value * 0.9144; break;
+            case "millas": meters = value * 1609.34; break;
+            case "kilómetros": meters = value * 1000; break;
+        }
+
+        // Convert from meters to the target unit
+        switch (toUnit) {
+            case "milímetros": return meters * 1000;
+            case "centímetros": return meters * 100;
+            case "decímetros": return meters * 10;
+            case "metros": return meters;
+            case "pulgadas": return meters / 0.0254;
+            case "pies": return meters / 0.3048;
+            case "yardas": return meters / 0.9144;
+            case "millas": return meters / 1609.34;
+            case "kilómetros": return meters / 1000;
+        }
+
+        return 0;
+    }
+}
