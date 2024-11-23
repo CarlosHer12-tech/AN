@@ -152,3 +152,158 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
+--
+
+package com.example.myapplication;
+
+import android.Manifest;
+import android.content.ContentProviderOperation;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.databinding.ActivityMainBinding;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
+    private static final int WRITE_CONTACT_PERMISSION_CODE = 100;
+    private Uri imageUri;
+    private String[] contactPermissions;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        // Define permisos necesarios
+        contactPermissions = new String[]{Manifest.permission.WRITE_CONTACTS};
+
+        // Configuración de listeners para los botones
+        binding.imagen.setOnClickListener(v -> openGallery());
+        binding.salvar.setOnClickListener(v -> saveContact());
+    }
+
+    // Método para abrir la galería
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(galleryIntent);
+    }
+
+    // Lanzador para manejar el resultado de seleccionar una imagen
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    imageUri = result.getData().getData();
+                    binding.imagen.setImageURI(imageUri);
+                } else {
+                    Toast.makeText(this, "Selección de imagen cancelada", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+
+    // Método para guardar el contacto
+    private void saveContact() {
+        String nombres = binding.nombres.getText().toString().trim();
+        String ap = binding.ap.getText().toString().trim();
+        String celular = binding.celular.getText().toString().trim();
+        String casa = binding.casa.getText().toString().trim();
+        String email = binding.email.getText().toString().trim();
+        String direccion = binding.direccion.getText().toString().trim();
+
+        ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
+        int rawContactId = cpo.size();
+
+        // Crear contacto vacío
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue("account_type", null)
+                .withValue("account_name", null)
+                .build());
+
+        // Añadir nombres
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, nombres)
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, ap)
+                .build());
+
+        // Añadir número de celular
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, celular)
+                .withValue(ContactsContract.CommonDataKinds.Phone.TYPE,
+                        ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                .build());
+
+        // Añadir email
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.Email.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.Email.ADDRESS, email)
+                .build());
+
+        // Añadir dirección
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS, direccion)
+                .build());
+
+        // Añadir foto (si está disponible)
+        if (imageUri != null) {
+            byte[] imageBytes = imageUriToBytes(imageUri);
+            if (imageBytes != null) {
+                cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                        .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                        .withValue(ContactsContract.Data.MIMETYPE,
+                                ContactsContract.CommonDataKinds.Photo.CONTENT_ITEM_TYPE)
+                        .withValue(ContactsContract.CommonDataKinds.Photo.PHOTO, imageBytes)
+                        .build());
+            }
+        }
+
+        // Guardar contacto en el dispositivo
+        try {
+            getContentResolver().applyBatch(ContactsContract.AUTHORITY, cpo);
+            Toast.makeText(this, "Contacto guardado", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al guardar el contacto", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Convertir URI de imagen a bytes
+    private byte[] imageUriToBytes(Uri uri) {
+        try {
+            Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), uri);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, baos);
+            return baos.toByteArray();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+}
