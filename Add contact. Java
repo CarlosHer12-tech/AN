@@ -1,8 +1,5 @@
 public class MainActivity extends AppCompatActivity {
-
-    private ActivityMainBinding binding;
-    private static final int WRITE_CONTACT_PERMISSION_CODE = 100;
-    private static final int IMAGE_PICK_GALLERY_CODE = 200;
+atic final int IMAGE_PICK_GALLERY_CODE = 200;
     private Uri imageUri;
     private String[] contactPermissions;
 
@@ -305,5 +302,66 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             return null;
         }
+    }
+}
+
+////
+package com.example.myapplication;
+
+import android.Manifest;
+import android.content.ContentProviderOperation;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.myapplication.databinding.ActivityMainBinding;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
+    private Uri imageUri;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        binding.imagen.setOnClickListener(v -> openGallery());
+        binding.salvar.setOnClickListener(v -> saveContact());
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        galleryLauncher.launch(galleryIntent);
+    }
+
+    private final ActivityResultLauncher<Intent> galleryLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+                    imageUri = result.getData().getData();
+                    binding.imagen.setImageURI(imageUri);
+                } else {
+                    Toast.makeText(this, "Selección de imagen cancelada", Toast.LENGTH_SHORT).show();
+                }
+            }
+    );
+
+    private void saveContact() {
+        // Lógica para guardar contacto...
     }
 }
