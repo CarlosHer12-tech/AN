@@ -1,0 +1,69 @@
+public class MainActivity extends AppCompatActivity {
+
+    private ActivityMainBinding binding;
+    private static final int WRITE_CONTACT_PERMISSION_CODE = 100;
+    private static final int IMAGE_PICK_GALLERY_CODE = 200;
+    private Uri imageUri;
+    private String[] contactPermissions;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        binding = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(binding.getRoot());
+
+        contactPermissions = new String[]{Manifest.permission.WRITE_CONTACTS};
+
+        binding.imagen.setOnClickListener(v -> openGallery());
+        binding.salvar.setOnClickListener(v -> saveContact());
+    }
+
+    private void openGallery() {
+        Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        startActivityForResult(galleryIntent, IMAGE_PICK_GALLERY_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode == RESULT_OK && requestCode == IMAGE_PICK_GALLERY_CODE) {
+            imageUri = data.getData();
+            binding.imagen.setImageURI(imageUri);
+        }
+    }
+
+    private void saveContact() {
+        String nombres = binding.nombres.getText().toString().trim();
+        String ap = binding.ap.getText().toString().trim();
+        String celular = binding.celular.getText().toString().trim();
+        String casa = binding.casa.getText().toString().trim();
+        String email = binding.email.getText().toString().trim();
+        String direccion = binding.direccion.getText().toString().trim();
+
+        ArrayList<ContentProviderOperation> cpo = new ArrayList<>();
+        int rawContactId = cpo.size();
+
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                .withValue("account_type", null)
+                .withValue("account_name", null)
+                .build());
+
+        cpo.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, rawContactId)
+                .withValue(ContactsContract.Data.MIMETYPE,
+                        ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME, nombres)
+                .withValue(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME, ap)
+                .build());
+
+        // Add more fields like phone, email, address, etc.
+
+        try {
+            getContentResolver().applyBatch(ContactsContract.AUTHORITY, cpo);
+            Toast.makeText(this, "Contacto guardado", Toast.LENGTH_SHORT).show();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Error al guardar contacto", Toast.LENGTH_SHORT).show();
+        }
+    }
+}
